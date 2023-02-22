@@ -54,6 +54,7 @@ tests = testGroup "Combinators, high level"
         , testModelMatchM "switchE1"            switchE1
         , testModelMatchM "switchB1"            switchB1
         , testModelMatchM "switchB2"            switchB2
+        , testModelMatchM "switchE_observeE_accumE" switchE_observeE_accumE
         ]
     , testGroup "Regression tests"
         [ testModelMatchM "issue79" issue79
@@ -198,6 +199,12 @@ observeE_stepper e = observeE $ (valueB =<< mb) <$ e
     where
     mb :: Moment (Behavior Int)
     mb = stepper 0 e
+
+switchE_observeE_accumE :: Event Int -> Moment (Event Int)
+switchE_observeE_accumE e = switchE never (observeE $ me <$ e)
+    where
+    me :: Moment (Event Int)
+    me = accumE 0 ((+) <$> e)
 
 valueB_immediate e = do
     x <- valueB =<< stepper 0 e
